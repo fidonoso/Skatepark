@@ -1,0 +1,82 @@
+
+<div class="justify-content-end d-flex">
+<div id="admin" class="card mb-3" style="max-width: 250px;">
+  <div class="row ">
+    <div class="col-md-4">
+      <img src={{foto}} height="100px" class="img-fluid rounded-start" alt="{{nombre}}">
+    </div>
+    <div class="col-md-8">
+      <div class="card-body p-0">
+        <h5 class="card-title">Administrador</h5>
+        <p class="card-text mb-0">{{nombre}}</p>
+        <p class="card-text"><small class="text-muted">{{email}}</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+      <a id="inicio" href='/' ><h1>Skate Park</h1></a>
+
+    <div class="py-4">
+      <h2>Administración</h2>
+
+
+      <hr class="w-50" />
+
+      <table class="table w-50 m-auto">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Foto</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Años de experiencia</th>
+            <th scope="col">Especialidad</th>
+            <th scope="col">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each users}}
+          <tr>
+            <th scope="row">{{inc @index }}</th>
+            <td><div><img src="{{this.foto}}" width="70px" height="70px"></div></td>
+             <td>{{this.nombre}}</td>
+            <td>{{this.anos_experiencia}}</td>
+            <td>{{this.especialidad}}</td>            
+            <td><input onclick="changeState({{this.id}}, this)" type="checkbox" {{#if this.estado}} checked  {{/if}} /></td>             
+          </tr>
+
+         {{/each}}
+        </tbody>
+      </table>
+    </div>
+<script>
+const changeState=async (id, e)=>{
+  const status=e.checked
+  const cambio= await fetch('/skaters',{
+    method: 'PUT',
+    body: JSON.stringify({id, status}),
+    headers: {
+        "Content-Type": "application/json"
+      }
+  })
+ const res= await cambio.json()
+ if(status){
+   await Swal.fire({
+  position: 'center',
+  icon: 'success',
+  title: 'Skater habilitado para el evento',
+  showConfirmButton: false,
+  timer: 1500
+})
+ }else{
+   await Swal.fire({
+  position: 'center',
+  icon: 'error',
+  title: 'Skater deshabilitado para el evento',
+  showConfirmButton: false,
+  timer: 1500
+ })
+
+}}
+
+</script>

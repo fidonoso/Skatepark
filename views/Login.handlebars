@@ -1,0 +1,74 @@
+
+    <a id="inicio" href='/' ><h1>Skate Park</h1></a>
+
+    <div class="py-5">
+      <h2>Iniciar Sesión</h2>
+      <hr class="w-50" />
+
+      <form id="form" method="POST" action="">
+        <div class="form-group">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email"type="email" name="email" class="form-control w-50 m-auto" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id='password' type="password"name="password" class="form-control w-50 m-auto" required/>
+          </div>
+        </div>
+        <button type='submit' class="btn btn-success mb-3">Ingresar</button>
+        <p>¿Aún no tienes cuenta? <a href="/registro">Regístrate</a></p>
+      </form>
+    </div>
+
+<script>
+  document.querySelector('#form').addEventListener('submit', async (e)=>{
+    e.preventDefault()
+ let email=document.getElementById("email").value;
+ let password=document.getElementById("password").value;
+ 
+    let payload={
+     email,
+     password
+    }
+   try{
+    const res= await fetch('/verificacion', {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json"
+      }
+      });
+    const data=await res.json()
+    
+    if(data.tipo=='admin'){
+     await Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'Autenticación y autorización de administrador exitosa',
+        showConfirmButton: false,
+        timer: 1500
+      })
+      window.location.href=`/admin?token=${data.token}`
+    }else if(data.tipo=='user'){
+    await Swal.fire({
+      position: 'center',
+      icon: 'success',
+      title: 'Skater logueado con éxito',
+      showConfirmButton: false,
+      timer: 1500
+    })
+      window.location.href=`/skater?token=${data.token}`
+    }
+    if(data.error) throw new Error
+   }catch(e){
+     await Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Correo y/o contraseña incorrecta',
+            footer: '<a href="/">Volver a pantalla principal?</a>'
+          })
+     console.log(`Error : ${e}`)
+   }
+  })
+</script>

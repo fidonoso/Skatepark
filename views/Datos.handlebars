@@ -1,0 +1,179 @@
+
+      <a id="inicio" href='/' ><h1>Skate Park</h1></a>
+
+    <div class="py-4">
+      <h2>Datos del perfil</h2>
+      <hr class="w-50" />
+
+      <form id="formulario">
+        <div class="form-group row w-50 m-auto">
+          <div class="form-group col-12 col-sm-6">
+            <label>Email</label>
+            <input id="email" name="email"
+              class="form-control m-auto"
+              disabled
+              value={{email}}
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Nombre</label>
+            <input id='nombre' name='nombre'class="form-control m-auto" value='{{nombre}}' />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Password</label>
+            <input id='password' name="password"
+              type="password"
+              class="form-control m-auto"
+              value={{password}}
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Repita la password</label>
+            <input id='pass' name="pass"
+              type="password"
+              class="form-control m-auto"
+              value={{password}}
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Años de experiencia</label>
+            <input id="anos_experiencia" name="anos_experiencia" class="form-control m-auto" value={{anos_experiencia}} />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Especialidad</label>
+            <input id='especialidad' name="especialidad"class="form-control m-auto" value='{{especialidad}}' />
+          </div>
+        </div>
+        <div class="mb-1">
+          <button type="button" id='actualizar' class="btn btn-primary" >Actualizar</button>
+        </div>
+        <div>
+          <button type="button" id='eliminar' class="btn btn-danger">Eliminar cuenta</button>
+        </div>
+      </form>
+    </div>
+<script>
+  let formulario= document.getElementById('formulario')
+  document.getElementById('actualizar').addEventListener('click', async (e)=>{
+    e.preventDefault();
+    let pass= document.getElementById('pass').value 
+    let password= document.getElementById('password').value 
+    let nombre=document.getElementById('nombre').value
+    let anos_experiencia=document.getElementById('anos_experiencia').value
+    let especialidad=document.getElementById('especialidad').value
+    if(pass !== password){
+
+    return await Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Las contraseñas no coinciden',
+            footer: '<a href="/">Volver a pantalla principal?</a>'
+          })
+    } 
+    if(nombre=='' || anos_experiencia=='' || especialidad==''){
+      return await Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Complete todos los campos',
+            footer: '<a href="/">Volver a pantalla principal?</a>'
+          })
+    }
+    let payload ={
+      email: document.getElementById('email').value,
+      nombre: document.getElementById('nombre').value,
+      password: document.getElementById('password').value,
+      anos_experiencia: document.getElementById('anos_experiencia').value,
+      especialidad: document.getElementById('especialidad').value,
+    }
+    try{
+      const res= await fetch('/updateSkater', {
+        method: "PUT",
+        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      const data=await res.json()
+
+      await Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Datos de usuario actualizados',
+        showConfirmButton: false,
+        timer: 2000
+      })
+      window.location.href="/"
+    }catch(e){
+      alert('Ha ocurrido un error en la actualizacion de los datos')
+      console.log(`Error: ${e}`)
+    }
+  })
+     
+     
+  document.getElementById('eliminar').addEventListener('click', async(e)=>{
+    e.preventDefault()
+    
+  const swalWithBootstrapButtons = Swal.mixin({
+    customClass: {
+      confirmButton: 'btn btn-success',
+      cancelButton: 'btn btn-danger'
+    },
+    buttonsStyling: false
+  })
+  
+  swalWithBootstrapButtons.fire({
+    title: 'Eliminar cuenta',
+    text: "¿Estas seguro de eliminar la cuenta?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Si, Eliminar !',
+    cancelButtonText: 'No, cancelar!',
+    reverseButtons: true
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+
+        let payload ={
+            email: document.getElementById('email').value,
+          }
+          try{
+            const res= await fetch('/deleteSkater', {
+              method: "DELETE",
+              body: JSON.stringify(payload),
+              headers: {
+                "Content-Type": "application/json"
+              }
+            });
+            const data=await res.json()
+            console.log(data)
+              await swalWithBootstrapButtons.fire(
+        'Eliminado!',
+        'Fuiste eliminado de los registros',
+        'success'
+      )
+           
+            window.location.href="/"
+          }catch(e){
+            await Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Ha ocurrido un error al tratar de eliminar la cuenta',
+            footer: '<a href="/">Volver a pantalla principal?</a>'
+          })
+            console.log(`Error: ${e}`)
+          }
+
+    } else if (
+
+      result.dismiss === Swal.DismissReason.cancel
+    ) {
+      swalWithBootstrapButtons.fire(
+        'Cancelado',
+        'Aún perteneces al evento :)',
+        'error'
+      )
+    }
+  })
+  })
+
+</script>
+
